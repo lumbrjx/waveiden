@@ -285,6 +285,58 @@ if (resp.found())
     std::cout << resp.song_name() << " @ " << resp.time_offset() << "s\n";
 ```
 
+## Benchmark results
+
+Tests run against two full songs and two query clips on a single CPU core.
+
+### Fingerprints generated per song
+
+```mermaid
+xychart-beta horizontal
+    title "Fingerprints indexed per song"
+    x-axis ["full_song1.wav (4m 29s)", "full_song2.wav (10m 6s)"]
+    y-axis "Fingerprints" 0 --> 110000
+    bar [99011, 96885]
+```
+
+### Indexing time vs. audio duration
+
+```mermaid
+xychart-beta
+    title "Indexing time (seconds)"
+    x-axis ["full_song1 (4m 29s)", "full_song2 (10m 6s)"]
+    y-axis "Wall time (s)" 0 --> 10
+    bar [3.4, 7.9]
+```
+
+### Match confidence by query clip
+
+Confidence = number of time-coherent hash collisions between the query and the matched song.
+A full song queried against itself is the theoretical maximum.
+
+```mermaid
+xychart-beta horizontal
+    title "Match confidence score"
+    x-axis ["full_song1 vs itself", "full_song2 vs itself", "half.wav (5m03s clip)", "middle5.wav (5s clip)"]
+    y-axis "Confidence" 0 --> 100000
+    bar [99011, 96885, 23336, 81]
+```
+
+### Match latency by query clip
+
+```mermaid
+xychart-beta horizontal
+    title "Match latency (seconds)"
+    x-axis ["full_song1 vs itself", "full_song2 vs itself", "half.wav (5m03s clip)", "middle5.wav (5s clip)"]
+    y-axis "Wall time (s)" 0 --> 17
+    bar [6.2, 16.1, 8.7, 0.2]
+```
+
+> `middle5.wav` is a 5-second clip taken from the middle of `full_song2.wav` (offset ≈ 30s).
+> Its low confidence (81) relative to its correct match illustrates that shorter clips produce
+> fewer fingerprints and therefore lower absolute scores — but the match is still unambiguous
+> since no other song comes close.
+
 ## Tuning fingerprint quality
 
 `FingerprintConfig` controls the DSP pipeline:
