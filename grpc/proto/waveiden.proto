@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package waveiden;
+
+option cc_generic_services = false;
+
+service WaveidenService {
+    // Index (register) a song by sending its raw audio bytes
+    rpc IndexSong(IndexSongRequest) returns (IndexSongResponse);
+    // Match a query audio clip against the database
+    rpc MatchSong(MatchSongRequest) returns (MatchSongResponse);
+    // List all indexed songs
+    rpc ListSongs(ListSongsRequest) returns (ListSongsResponse);
+    // Remove a song by name
+    rpc RemoveSong(RemoveSongRequest) returns (RemoveSongResponse);
+    // Wipe the entire database
+    rpc ClearDatabase(ClearDatabaseRequest) returns (ClearDatabaseResponse);
+}
+
+// ---------- IndexSong ----------
+message IndexSongRequest {
+    string name       = 1;  // logical song name / identifier
+    bytes  audio_data = 2;  // raw WAV bytes
+}
+
+message IndexSongResponse {
+    bool   success          = 1;
+    int32  fingerprint_count = 2;
+    string error            = 3;
+}
+
+// ---------- MatchSong ----------
+message MatchSongRequest {
+    bytes audio_data = 1;  // raw WAV bytes of the query clip
+}
+
+message MatchSongResponse {
+    bool   found       = 1;
+    string song_name   = 2;
+    int32  confidence  = 3;  // number of time-consistent hash matches
+    double time_offset = 4;  // estimated offset in seconds within the matched song
+    string error       = 5;
+}
+
+// ---------- ListSongs ----------
+message ListSongsRequest {}
+
+message ListSongsResponse {
+    repeated string songs = 1;
+}
+
+// ---------- RemoveSong ----------
+message RemoveSongRequest {
+    string name = 1;
+}
+
+message RemoveSongResponse {
+    bool   success = 1;
+    string error   = 2;
+}
+
+// ---------- ClearDatabase ----------
+message ClearDatabaseRequest {}
+
+message ClearDatabaseResponse {
+    bool   success = 1;
+    string error   = 2;
+}
