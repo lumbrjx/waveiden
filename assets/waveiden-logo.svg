@@ -6,11 +6,7 @@
     </linearGradient>
     <g id="word">
       <!-- W -->
-      <g>
-        <rect x="0" y="0" width="13" height="65"/><rect x="52" y="0" width="13" height="65"/>
-        <rect x="13" y="39" width="13" height="13"/><rect x="26" y="20" width="13" height="32"/>
-        <rect x="39" y="39" width="13" height="13"/><rect x="13" y="52" width="39" height="13"/>
-      </g>
+      <path d="M0 0h13v39h13V20h13v19h13V0h13v52H52V39H39v13H26V39H13v13H0z"/>
       <!-- A -->
       <g transform="translate(75)">
         <rect x="13" y="0" width="39" height="13"/><rect x="0" y="13" width="13" height="52"/>
