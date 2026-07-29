@@ -1,4 +1,10 @@
-# waveiden
+<p align="center">
+  <img src="./assets/waveiden-logo.svg" width="590" alt="WAVEIDEN" />
+</p>
+
+<p align="center">
+  Acoustic fingerprinting for fast, local music identification.
+</p>
 
 Audio fingerprinting library and CLI — identify songs from short audio clips.
 
@@ -12,6 +18,14 @@ waveiden builds a compact acoustic fingerprint database from full-length audio f
 4. At query time, look up hashes and vote on the song with the most time-consistent hits
 
 A 30-second clip is enough for a reliable match against a database of thousands of songs. The library works against noisy or pitch-shifted recordings because the fingerprints are based on relative peak relationships rather than raw waveform content.
+
+## Terminal dashboard
+
+Waveiden also includes a single-screen terminal dashboard for capture, local-library management, and live spectral feedback.
+
+<p align="center">
+  <img src="./assets/tui-dashboard.png" alt="Waveiden terminal dashboard recording audio" />
+</p>
 
 ## Architecture
 
@@ -142,10 +156,12 @@ Launch the signal console with:
 The bare `waveiden` command opens the TUI against `fingerprint.db`. To open a
 different database, use `waveiden tui library.db`.
 
-It uses a pixel-art receiver, animated spectrum and radar display, and works
-entirely by keyboard. `1` opens the signal deck, `2` the library, `I` indexes
-an audio file, `M` identifies a clip, `D` removes the selected library entry,
-and `Q` exits. The UI needs a terminal of at least 76×28 characters.
+The dashboard combines capture, indexed tracks, live spectrogram, status, and
+keyboard help on one screen. It works entirely by keyboard: `C` records a
+microphone sample, `I` indexes an audio file, `M` identifies a clip, arrow keys
+select a library entry, `D` removes it, and `Q` exits. Press `Esc` or `Ctrl-C`
+to cancel an active prompt, recording, or analysis. The UI needs a terminal of
+at least 76×34 characters.
 
 ### Makefile shortcuts
 

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 590 76" role="img" aria-label="WAVEIDEN" shape-rendering="crispEdges">
+  <defs>
+    <linearGradient id="ink" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#d0bdff"/>
+      <stop offset="1" stop-color="#a78bfa"/>
+    </linearGradient>
+    <g id="word">
+      <!-- W -->
+      <g>
+        <rect x="0" y="0" width="13" height="65"/><rect x="52" y="0" width="13" height="65"/>
+        <rect x="13" y="39" width="13" height="13"/><rect x="26" y="20" width="13" height="32"/>
+        <rect x="39" y="39" width="13" height="13"/><rect x="13" y="52" width="39" height="13"/>
+      </g>
+      <!-- A -->
+      <g transform="translate(75)">
+        <rect x="13" y="0" width="39" height="13"/><rect x="0" y="13" width="13" height="52"/>
+        <rect x="52" y="13" width="13" height="52"/><rect x="13" y="26" width="39" height="13"/>
+      </g>
+      <!-- V -->
+      <g transform="translate(150)"><path d="M0 0h13v39h13v13h13V39h13V0h13v52H52v13H13V52H0z"/></g>
+      <!-- E -->
+      <g transform="translate(225)"><path d="M0 0h65v13H13v13h39v13H13v13h52v13H0z"/></g>
+      <!-- I -->
+      <g transform="translate(300)"><path d="M0 0h65v13H39v39h26v13H0V52h26V13H0z"/></g>
+      <!-- D -->
+      <g transform="translate(375)"><path d="M0 0h52v13h13v39H52v13H0zm13 13v39h26V39h13V26H39V13z" fill-rule="evenodd"/></g>
+      <!-- E -->
+      <g transform="translate(450)"><path d="M0 0h65v13H13v13h39v13H13v13h52v13H0z"/></g>
+      <!-- N -->
+      <g transform="translate(525)"><path d="M0 0h13l39 39V0h13v65H52L13 26v39H0z"/></g>
+    </g>
+  </defs>
+  <use href="#word" transform="translate(0 11)" fill="#435b91"/>
+  <use href="#word" fill="url(#ink)"/>
+</svg>
