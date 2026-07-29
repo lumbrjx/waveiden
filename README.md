@@ -74,7 +74,7 @@ make grpc
 
 The build produces:
 - `build/libwaveiden.a` — static library
-- `build/waveiden_cli` — command-line tool
+- `build/waveiden` — animated terminal UI and command-line tool
 
 ## Installation
 
@@ -101,32 +101,51 @@ g++ -std=c++17 main.cpp -lwaveiden -lsndfile -o app
 ## CLI usage
 
 ```
-waveiden_cli <mode> [args...]
+waveiden [mode] [args...]
 
   index  <db_path> <song.wav> [song2.wav ...]   Index one or more songs
   match  <db_path> <query.wav>                   Match a clip against the database
   list   <db_path>                               List all indexed songs
   remove <db_path> <name>                        Remove a song by name
   clear  <db_path>                               Wipe the entire database
+  tui    <db_path>                               Open the animated signal console
 ```
+
+Run `waveiden` with no arguments to open the animated TUI.
 
 ```bash
 # Index a music library
-./build/waveiden_cli index library.db song1.wav song2.wav song3.wav
+./build/waveiden index library.db song1.wav song2.wav song3.wav
 
 # Identify a recording or clip
-./build/waveiden_cli match library.db unknown_clip.wav
+./build/waveiden match library.db unknown_clip.wav
 # MATCH: song2.wav  confidence=8400  offset=42.3s
 
 # See what is in the database
-./build/waveiden_cli list library.db
+./build/waveiden list library.db
 
 # Remove a single entry
-./build/waveiden_cli remove library.db song1.wav
+./build/waveiden remove library.db song1.wav
 
 # Wipe everything
-./build/waveiden_cli clear library.db
+./build/waveiden clear library.db
 ```
+
+### Animated terminal UI
+
+Launch the signal console with:
+
+```bash
+./build/waveiden
+```
+
+The bare `waveiden` command opens the TUI against `fingerprint.db`. To open a
+different database, use `waveiden tui library.db`.
+
+It uses a pixel-art receiver, animated spectrum and radar display, and works
+entirely by keyboard. `1` opens the signal deck, `2` the library, `I` indexes
+an audio file, `M` identifies a clip, `D` removes the selected library entry,
+and `Q` exits. The UI needs a terminal of at least 76×28 characters.
 
 ### Makefile shortcuts
 

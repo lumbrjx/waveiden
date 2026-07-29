@@ -1,3 +1,6 @@
+.*
+!.gitignore
+
 *.wav
 *.mp3
 *.db

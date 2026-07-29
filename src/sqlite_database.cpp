@@ -7,6 +7,11 @@
 
 namespace waveiden {
 
+// A single landmark collision is not evidence of the same recording. Require
+// a meaningful cluster of hashes at one consistent time offset before naming a
+// match; this prevents a one-song library from becoming a default answer.
+static constexpr int kMinimumConsistentHits = 20;
+
 struct SQLiteDatabase::Impl {
     sqlite3* db = nullptr;
 
@@ -142,6 +147,8 @@ MatchResult SQLiteDatabase::match(const std::vector<Fingerprint>& query) const {
             }
         }
     }
+    if (result.confidence < kMinimumConsistentHits)
+        return {};
     return result;
 }
 

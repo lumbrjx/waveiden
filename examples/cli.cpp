@@ -1,6 +1,9 @@
 #include <waveiden/waveiden.hpp>
 #include <iostream>
 #include <stdexcept>
+#ifdef WAVEIDEN_HAS_TUI
+#include "tui.hpp"
+#endif
 
 static void usage(const char* prog) {
     std::cerr << "Usage: " << prog << " <mode> [args...]\n"
@@ -9,10 +12,29 @@ static void usage(const char* prog) {
               << "  match <db_path> <query.wav>                  Match a clip\n"
               << "  list  <db_path>                              List indexed songs\n"
               << "  remove <db_path> <name>                      Remove a song\n"
-              << "  clear <db_path>                              Wipe database\n";
+              << "  clear <db_path>                              Wipe database\n"
+              << "  tui    <db_path>                              Open animated dashboard\n";
 }
 
 int main(int argc, char* argv[]) {
+    // The dashboard is Waveiden's primary experience; command modes remain
+    // available for scripting and automation.
+    if (argc == 1) {
+#ifdef WAVEIDEN_HAS_TUI
+        return runTui("fingerprint.db");
+#else
+        std::cerr << "This build was configured with WAVEIDEN_BUILD_TUI=OFF\n";
+        return 1;
+#endif
+    }
+    if (argc >= 2 && std::string(argv[1]) == "tui") {
+#ifdef WAVEIDEN_HAS_TUI
+        return runTui(argc >= 3 ? argv[2] : "fingerprint.db");
+#else
+        std::cerr << "This build was configured with WAVEIDEN_BUILD_TUI=OFF\n";
+        return 1;
+#endif
+    }
     if (argc < 3) { usage(argv[0]); return 1; }
 
     const std::string mode   = argv[1];

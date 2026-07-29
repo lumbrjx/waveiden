@@ -1,6 +1,6 @@
 BUILD_DIR   := build
 CMAKE_FLAGS := -DCMAKE_BUILD_TYPE=Release -Wno-dev
-CLI         := $(BUILD_DIR)/waveiden_cli
+CLI         := $(BUILD_DIR)/waveiden
 SERVER      := $(BUILD_DIR)/waveiden_grpc_server
 CLIENT      := $(BUILD_DIR)/waveiden_grpc_client
 

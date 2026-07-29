@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(WAVEIDEN_BUILD_CLI   "Build the CLI example"    ON)
+option(WAVEIDEN_BUILD_TUI   "Build the animated terminal UI" ON)
 option(WAVEIDEN_ENABLE_GRPC "Build the gRPC extension" OFF)
 
 # ── SQLite amalgamation (no system sqlite-devel required) ─────────────────────
@@ -49,8 +50,21 @@ target_compile_options(waveiden PRIVATE
 
 # ── CLI example ───────────────────────────────────────────────────────────────
 if(WAVEIDEN_BUILD_CLI)
-    add_executable(waveiden_cli examples/cli.cpp)
+    set(WAVEIDEN_CLI_SOURCES examples/cli.cpp)
+    if(WAVEIDEN_BUILD_TUI)
+        pkg_check_modules(NCURSESW REQUIRED IMPORTED_TARGET ncursesw)
+        pkg_check_modules(PORTAUDIO REQUIRED IMPORTED_TARGET portaudio-2.0)
+        list(APPEND WAVEIDEN_CLI_SOURCES examples/tui.cpp)
+    endif()
+    add_executable(waveiden_cli ${WAVEIDEN_CLI_SOURCES})
+    # Keep the target name stable for downstream build scripts, while exposing
+    # the product as the concise `waveiden` command to users.
+    set_target_properties(waveiden_cli PROPERTIES OUTPUT_NAME waveiden)
     target_link_libraries(waveiden_cli PRIVATE waveiden)
+    if(WAVEIDEN_BUILD_TUI)
+        target_link_libraries(waveiden_cli PRIVATE PkgConfig::NCURSESW PkgConfig::PORTAUDIO)
+        target_compile_definitions(waveiden_cli PRIVATE WAVEIDEN_HAS_TUI=1)
+    endif()
 endif()
 
 # ── gRPC extension ────────────────────────────────────────────────────────────
@@ -114,6 +128,10 @@ include(GNUInstallDirs)
 install(TARGETS waveiden
         EXPORT  waveidenTargets
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+if(WAVEIDEN_BUILD_CLI)
+    install(TARGETS waveiden_cli
+            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()
 install(DIRECTORY include/waveiden
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(EXPORT waveidenTargets
