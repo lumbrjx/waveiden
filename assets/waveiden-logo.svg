@@ -6,7 +6,9 @@
     </linearGradient>
     <g id="word">
       <!-- W -->
-      <path d="M0 0h13v39h13V20h13v19h13V0h13v52H52V39H39v13H26V39H13v13H0z"/>
+      <g transform="matrix(1 0 0 1.25 0 0)">
+        <path d="M0 0h13v39h13V20h13v19h13V0h13v52H52V39H39v13H26V39H13v13H0z"/>
+      </g>
       <!-- A -->
       <g transform="translate(75)">
         <rect x="13" y="0" width="39" height="13"/><rect x="0" y="13" width="13" height="52"/>
