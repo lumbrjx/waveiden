@@ -9,6 +9,9 @@
 namespace waveiden {
 
 struct FingerprintConfig {
+    // All inputs are resampled to this rate before fingerprinting. Landmark
+    // bins are only comparable when they share a sample rate.
+    int targetSampleRate = 44100;
     int frameSize       = 2048;
     int hopSize         = 512;
     double peakPct      = 98.5;

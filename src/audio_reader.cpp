@@ -44,10 +44,15 @@ AudioBuffer sndfileToBuffer(SNDFILE* file, const SF_INFO& info) {
     sf_readf_double(file, raw.data(), info.frames);
     sf_close(const_cast<SNDFILE*>(file));
 
-    // Downmix to mono (take first channel)
+    // Downmix to mono. Averaging avoids losing music panned away from the
+    // first channel in a stereo master.
     std::vector<double> mono(static_cast<size_t>(info.frames));
-    for (sf_count_t i = 0; i < info.frames; i++)
-        mono[static_cast<size_t>(i)] = raw[static_cast<size_t>(i) * info.channels];
+    for (sf_count_t i = 0; i < info.frames; i++) {
+        double sum = 0.0;
+        for (int channel = 0; channel < info.channels; ++channel)
+            sum += raw[static_cast<size_t>(i) * info.channels + channel];
+        mono[static_cast<size_t>(i)] = sum / info.channels;
+    }
 
     return {std::move(mono), info.samplerate, info.channels};
 }

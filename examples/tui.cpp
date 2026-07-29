@@ -43,6 +43,7 @@ struct AnalysisData {
 struct CaptureState {
   std::vector<double> samples;
   std::atomic<size_t> cursor{0};
+  int sampleRate = 0;
   size_t analyzed = 0;
   AnalysisData preview;
 };
@@ -92,15 +93,26 @@ int captureCallback(const void *input, void *, unsigned long frames,
 }
 
 waveiden::AudioBuffer recordMicrophone(Ui &ui, int seconds = 7) {
-  constexpr int sampleRate = 44100;
   CaptureState capture;
-  capture.samples.resize(static_cast<size_t>(sampleRate) * seconds);
   StderrSilencer silenceBackend;
   if (Pa_Initialize() != paNoError)
     throw std::runtime_error("Could not initialize microphone capture");
+  const PaDeviceIndex device = Pa_GetDefaultInputDevice();
+  const PaDeviceInfo *deviceInfo =
+      device == paNoDevice ? nullptr : Pa_GetDeviceInfo(device);
+  if (deviceInfo == nullptr || deviceInfo->defaultSampleRate <= 0) {
+    Pa_Terminate();
+    throw std::runtime_error("No default microphone is available");
+  }
+  capture.sampleRate = static_cast<int>(std::lround(deviceInfo->defaultSampleRate));
+  if (capture.sampleRate < 8000 || capture.sampleRate > 192000) {
+    Pa_Terminate();
+    throw std::runtime_error("Default microphone has an unsupported sample rate");
+  }
+  capture.samples.resize(static_cast<size_t>(capture.sampleRate) * seconds);
   PaStream *stream = nullptr;
   const PaError opened = Pa_OpenDefaultStream(
-      &stream, 1, 0, paFloat32, sampleRate, 256, captureCallback, &capture);
+      &stream, 1, 0, paFloat32, capture.sampleRate, 256, captureCallback, &capture);
   if (opened != paNoError) {
     Pa_Terminate();
     throw std::runtime_error("Could not open the default microphone");
@@ -125,7 +137,7 @@ waveiden::AudioBuffer recordMicrophone(Ui &ui, int seconds = 7) {
   Pa_CloseStream(stream);
   Pa_Terminate();
   capture.samples.resize(capture.cursor.load());
-  return {std::move(capture.samples), sampleRate, 1};
+  return {std::move(capture.samples), capture.sampleRate, 1};
 }
 
 std::string expandHomePath(const std::string &path) {
@@ -277,7 +289,8 @@ void drawHeader(const DashboardLayout &layout, const Ui &ui) {
 }
 
 void drawCapturePanel(const DashboardLayout &layout, const Ui &ui,
-                      bool recording, int seconds, size_t recorded) {
+                      bool recording, int seconds, size_t recorded,
+                      int sampleRate) {
   box(layout.topY, layout.margin, layout.topH, layout.captureW,
       recording ? "CAPTURE  /  LIVE" : "CAPTURE  /  MUSIC ID");
   musicNoteGlyph(layout.topY + 2,
@@ -288,7 +301,8 @@ void drawCapturePanel(const DashboardLayout &layout, const Ui &ui,
        recording ? kPink : kLime, A_BOLD);
   if (layout.topH >= 14 && recording) {
     text(layout.topY + 2, layout.margin + 3,
-         std::to_string(recorded / 44100) + " / " + std::to_string(seconds) +
+         std::to_string(recorded / static_cast<size_t>(sampleRate)) + " / " +
+             std::to_string(seconds) +
              " seconds  ·  Esc cancels",
          kMuted);
   } else if (layout.topH >= 14) {
@@ -367,11 +381,12 @@ void drawCommands(const DashboardLayout &layout) {
 }
 
 void dashboard(Ui &ui, const AnalysisData *signal = nullptr,
-               bool recording = false, int seconds = 7, size_t recorded = 0) {
+               bool recording = false, int seconds = 7, size_t recorded = 0,
+               int sampleRate = 44100) {
   erase();
   const DashboardLayout layout;
   drawHeader(layout, ui);
-  drawCapturePanel(layout, ui, recording, seconds, recorded);
+  drawCapturePanel(layout, ui, recording, seconds, recorded, sampleRate);
   drawLibraryPanel(layout, ui);
   drawSpectrumPanel(layout, ui, signal, recording);
   drawCommands(layout);
@@ -456,21 +471,21 @@ void drawSpectrogram(const AnalysisData &data, int y, int x, int width,
 }
 
 void renderRecording(Ui &ui, CaptureState &capture, int seconds) {
-  constexpr int sampleRate = 44100;
   const size_t recorded = capture.cursor.load(std::memory_order_acquire);
-  if (recorded >= 4096 && recorded - capture.analyzed >= 11025) {
-    const size_t start = recorded > static_cast<size_t>(sampleRate * 2)
-                             ? recorded - sampleRate * 2
+  if (recorded >= 4096 &&
+      recorded - capture.analyzed >= static_cast<size_t>(capture.sampleRate / 4)) {
+    const size_t start = recorded > static_cast<size_t>(capture.sampleRate * 2)
+                             ? recorded - capture.sampleRate * 2
                              : 0;
     waveiden::AudioBuffer recent;
-    recent.sampleRate = sampleRate;
+    recent.sampleRate = capture.sampleRate;
     recent.channels = 1;
     recent.samples.assign(capture.samples.begin() + start,
                           capture.samples.begin() + recorded);
     capture.preview = analyzeBuffer(ui, std::move(recent));
     capture.analyzed = recorded;
   }
-  dashboard(ui, &capture.preview, true, seconds, recorded);
+  dashboard(ui, &capture.preview, true, seconds, recorded, capture.sampleRate);
   ++ui.frame;
 }
 

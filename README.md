@@ -175,6 +175,10 @@ select a library entry, `D` removes it, and `Q` exits. Press `Esc` or `Ctrl-C`
 to cancel an active prompt, recording, or analysis. The UI needs a terminal of
 at least 76×34 characters.
 
+Audio is normalized to 44.1 kHz before fingerprints are generated, so file and
+microphone sample rates can differ. Re-index an existing database once after
+upgrading so its stored fingerprints use this normalization.
+
 ### Makefile shortcuts
 
 ```bash
