@@ -6,6 +6,18 @@
   Acoustic fingerprinting for fast, local music identification.
 </p>
 
+## Quick install (Linux x86_64)
+
+The latest successful build from `main` is published automatically. Install it with:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/lumbrjx/waveiden/main/scripts/install.sh | sh
+```
+
+The installer places `waveiden` in `~/.local/bin`. Install a specific release
+or choose another destination with `WAVEIDEN_VERSION=v1.0.0` or
+`WAVEIDEN_INSTALL_DIR=/path/to/bin` before the command.
+
 Audio fingerprinting library and CLI — identify songs from short audio clips.
 
 ## What it does
@@ -89,18 +101,6 @@ make grpc
 The build produces:
 - `build/libwaveiden.a` — static library
 - `build/waveiden` — animated terminal UI and command-line tool
-
-## Quick install (Linux x86_64)
-
-After the first release is published, install the latest binary with:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/lumbrjx/waveiden/main/scripts/install.sh | sh
-```
-
-The installer places `waveiden` in `~/.local/bin`. Install a specific release
-or choose another destination with `WAVEIDEN_VERSION=v1.0.0` or
-`WAVEIDEN_INSTALL_DIR=/path/to/bin` before the command.
 
 ## Installation
 

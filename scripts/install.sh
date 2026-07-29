@@ -22,7 +22,12 @@ temporary_dir="$(mktemp -d)"
 trap 'rm -rf "$temporary_dir"' EXIT HUP INT TERM
 
 echo "Downloading waveiden $version..."
-curl --fail --location --silent --show-error "$download_url" | tar -xz -C "$temporary_dir"
+archive="$temporary_dir/$asset"
+if ! curl --fail --location --silent --show-error --output "$archive" "$download_url"; then
+  echo "No compatible release asset is available yet: $download_url" >&2
+  exit 1
+fi
+tar -xzf "$archive" -C "$temporary_dir"
 mkdir -p "$install_dir"
 install -m 755 "$temporary_dir/waveiden" "$install_dir/waveiden"
 
